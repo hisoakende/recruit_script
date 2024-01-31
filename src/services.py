@@ -75,7 +75,7 @@ def _deserialize_dict(serialized_data: bytes, length: int) -> dict:
     return deserialized_data
 
 
-def _encode_leb128(value: bytes) -> bytes:
+def _encode_leb128(value: int) -> bytes:
     result = b''
     while True:
         byte = value & 0x7F
