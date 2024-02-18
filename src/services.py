@@ -68,7 +68,7 @@ def _deserialize_dict(serialized_data: bytes, length: int) -> dict:
 
         else:
             raise ValueError
-        print(key)
+
         deserialized_data[key] = value
         offset += value_length
 
@@ -76,29 +76,20 @@ def _deserialize_dict(serialized_data: bytes, length: int) -> dict:
 
 
 def _encode_leb128(value: int) -> bytes:
-    result = b''
+    r = []
     while True:
-        byte = value & 0x7F
+        byte = value & 0x7f
         value >>= 7
-
-        if value != 0:
-            byte |= 0x80
-        result += bytes([byte])
-
-        if value == 0:
-            break
-
-    return result
+        if (value == 0 and byte & 0x40 == 0) or (value == -1 and byte & 0x40 != 0):
+            r.append(byte)
+            return bytes(r)
+        r.append(0x80 | byte)
 
 
 def _decode_leb128(data: bytes) -> int:
-    result = 0
-    shift = 0
-    for byte in data:
-        result |= (byte & 0x7F) << shift
-        if not byte & 0x80:
-            break
-
-        shift += 7
-
-    return result
+    r = 0
+    for i, e in enumerate(data):
+        r += (e & 0x7f) << (i * 7)
+    if e & 0x40 != 0:
+        r |= - (1 << (i * 7) + 7)
+    return r
