@@ -68,7 +68,7 @@ def _deserialize_dict(serialized_data: bytes, length: int) -> dict:
 
         else:
             raise ValueError
-        print(key)
+        
         deserialized_data[key] = value
         offset += value_length
 
